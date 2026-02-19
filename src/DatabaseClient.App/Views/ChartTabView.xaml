@@ -1,0 +1,106 @@
+<UserControl x:Class="DatabaseClient.App.Views.ChartTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ Chart Configuration Toolbar ═══ -->
+        <Border Grid.Row="0" Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="8">
+            <WrapPanel Orientation="Horizontal">
+                <!-- Chart Type -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                    <TextBlock Text="Chart Type:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox ItemsSource="{Binding ChartTypes}" SelectedItem="{Binding SelectedChartType}"
+                              Width="100" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Label Column -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                    <TextBlock Text="Labels:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox ItemsSource="{Binding AvailableColumns}" SelectedItem="{Binding LabelColumn}"
+                              Width="150" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Value Column -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                    <TextBlock Text="Values:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox ItemsSource="{Binding AvailableColumns}" SelectedItem="{Binding ValueColumn}"
+                              Width="150" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Build Button -->
+                <Button Command="{Binding BuildChartCommand}" Padding="12,4" Margin="0,0,8,0"
+                        Style="{StaticResource MaterialDesignFlatMidBgButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ChartBar" Width="16" Height="16" Margin="0,0,4,0"/>
+                        <TextBlock Text="Build Chart" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Export Button -->
+                <Button Command="{Binding ExportChartCommand}" Padding="12,4"
+                        Style="{StaticResource MaterialDesignFlatButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Export" Width="16" Height="16" Margin="0,0,4,0"/>
+                        <TextBlock Text="Export Image" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </Border>
+
+        <!-- ═══ Chart Area ═══ -->
+        <Grid Grid.Row="1" Margin="8">
+            <!-- Title -->
+            <TextBlock Text="{Binding ChartTitle}" FontSize="16" FontWeight="Bold"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,4,0,0"
+                       Visibility="{Binding ChartTitle, Converter={StaticResource StringToVisConverter}}"/>
+
+            <!-- Cartesian Chart (Bar, Line, Column, Scatter) -->
+            <lvc:CartesianChart x:Name="CartesianChart"
+                                Series="{Binding Series}"
+                                XAxes="{Binding XAxes}"
+                                YAxes="{Binding YAxes}"
+                                ZoomMode="Both"
+                                TooltipPosition="Top">
+                <lvc:CartesianChart.Style>
+                    <Style TargetType="lvc:CartesianChart">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedChartType}" Value="Pie">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </lvc:CartesianChart.Style>
+            </lvc:CartesianChart>
+
+            <!-- Pie Chart -->
+            <lvc:PieChart x:Name="PieChart"
+                          Series="{Binding Series}"
+                          TooltipPosition="Top">
+                <lvc:PieChart.Style>
+                    <Style TargetType="lvc:PieChart">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedChartType}" Value="Pie">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </lvc:PieChart.Style>
+            </lvc:PieChart>
+        </Grid>
+
+        <!-- ═══ Status Bar ═══ -->
+        <Border Grid.Row="2" Background="{DynamicResource MahApps.Brushes.Gray10}"
+                Padding="8,4" BorderThickness="0,1,0,0" BorderBrush="LightGray">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12"/>
+        </Border>
+    </Grid>
+</UserControl>

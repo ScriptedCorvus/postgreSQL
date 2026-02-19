@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Menu & Toolbar -->
+  <data name="Menu_NewConnection" xml:space="preserve"><value>New Connection</value></data>
+  <data name="Menu_NewQuery" xml:space="preserve"><value>New Query</value></data>
+  <data name="Menu_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Menu_Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Menu_Scheduler" xml:space="preserve"><value>Scheduler</value></data>
+  <data name="Menu_Sharing" xml:space="preserve"><value>Sharing</value></data>
+  <data name="Menu_DataCompare" xml:space="preserve"><value>Data Compare</value></data>
+  <data name="Menu_SchemaCompare" xml:space="preserve"><value>Schema</value></data>
+  <data name="Menu_Migration" xml:space="preserve"><value>Migration</value></data>
+  <data name="Menu_Snippets" xml:space="preserve"><value>Snippets</value></data>
+  <data name="Menu_History" xml:space="preserve"><value>History</value></data>
+  <!-- Connection Dialog -->
+  <data name="Conn_Title" xml:space="preserve"><value>Connection Settings</value></data>
+  <data name="Conn_TestConnection" xml:space="preserve"><value>Test Connection</value></data>
+  <data name="Conn_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Conn_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Conn_ConnectionName" xml:space="preserve"><value>Connection Name</value></data>
+  <data name="Conn_DatabaseType" xml:space="preserve"><value>Database Type</value></data>
+  <data name="Conn_Host" xml:space="preserve"><value>Host</value></data>
+  <data name="Conn_Port" xml:space="preserve"><value>Port</value></data>
+  <data name="Conn_Username" xml:space="preserve"><value>Username</value></data>
+  <data name="Conn_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Conn_Database" xml:space="preserve"><value>Default Database</value></data>
+  <data name="Conn_UseSsl" xml:space="preserve"><value>Enable SSL/TLS</value></data>
+  <data name="Conn_UseSshTunnel" xml:space="preserve"><value>Use SSH Tunnel</value></data>
+  <!-- Query Tab -->
+  <data name="Query_Execute" xml:space="preserve"><value>Execute (F5)</value></data>
+  <data name="Query_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Query_ExplainPlan" xml:space="preserve"><value>Explain Plan</value></data>
+  <data name="Query_Transaction" xml:space="preserve"><value>Transaction</value></data>
+  <data name="Query_Results" xml:space="preserve"><value>Results</value></data>
+  <data name="Query_Messages" xml:space="preserve"><value>Messages</value></data>
+  <data name="Query_ExportResults" xml:space="preserve"><value>Export Results</value></data>
+  <!-- Settings -->
+  <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_General" xml:space="preserve"><value>General</value></data>
+  <data name="Settings_Appearance" xml:space="preserve"><value>Appearance</value></data>
+  <data name="Settings_Editor" xml:space="preserve"><value>Editor</value></data>
+  <data name="Settings_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <!-- Status Bar -->
+  <data name="Status_Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Status_Executing" xml:space="preserve"><value>Executing query...</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>Connected</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <!-- Common -->
+  <data name="Common_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Common_CloseAll" xml:space="preserve"><value>Close All Tabs</value></data>
+  <data name="Common_CloseOthers" xml:space="preserve"><value>Close Other Tabs</value></data>
+  <data name="Common_Browse" xml:space="preserve"><value>Browse...</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Common_Refresh" xml:space="preserve"><value>Refresh</value></data>
+</root>

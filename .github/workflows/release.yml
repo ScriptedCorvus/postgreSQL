@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        dotnet-quality: 'preview'
+
+    - name: Restore dependencies
+      run: dotnet restore DatabaseClient.slnx
+
+    - name: Run tests
+      run: dotnet test DatabaseClient.slnx --configuration Release --no-restore
+
+    - name: Publish (win-x64, self-contained)
+      run: |
+        dotnet publish src/DatabaseClient.App/DatabaseClient.App.csproj `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output ./publish/win-x64 `
+          -p:PublishSingleFile=true `
+          -p:IncludeNativeLibrariesForSelfExtract=true
+
+    - name: Publish (win-x64, framework-dependent)
+      run: |
+        dotnet publish src/DatabaseClient.App/DatabaseClient.App.csproj `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained false `
+          --output ./publish/win-x64-portable
+
+    - name: Create zip artifacts
+      run: |
+        Compress-Archive -Path ./publish/win-x64/* -DestinationPath ./DatabaseClient-win-x64-selfcontained.zip
+        Compress-Archive -Path ./publish/win-x64-portable/* -DestinationPath ./DatabaseClient-win-x64-portable.zip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+        files: |
+          DatabaseClient-win-x64-selfcontained.zip
+          DatabaseClient-win-x64-portable.zip

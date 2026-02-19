@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DatabaseClient.App/DatabaseClient.App.csproj" />
+    <Project Path="src/DatabaseClient.Core/DatabaseClient.Core.csproj" />
+    <Project Path="src/DatabaseClient.Data/DatabaseClient.Data.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DatabaseClient.Core.Tests/DatabaseClient.Core.Tests.csproj" />
+    <Project Path="tests/DatabaseClient.Data.Tests/DatabaseClient.Data.Tests.csproj" />
+    <Project Path="tests/DatabaseClient.UI.Tests/DatabaseClient.UI.Tests.csproj" />
+  </Folder>
+</Solution>

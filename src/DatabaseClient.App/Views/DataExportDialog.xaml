@@ -1,0 +1,204 @@
+<mah:MetroWindow x:Class="DatabaseClient.App.Views.DataExportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:DatabaseClient.App.ViewModels"
+        xmlns:local="clr-namespace:DatabaseClient.App.Views"
+        Title="Export Data" Height="620" Width="800"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        TitleCharacterCasing="Normal"
+        d:DataContext="{d:DesignInstance Type=vm:DataExportWizardViewModel}"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+
+    <mah:MetroWindow.Resources>
+        <local:StepFontWeightConverter x:Key="StepFontWeightConverter"/>
+    </mah:MetroWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ Step indicator ═══ -->
+        <Border Grid.Row="0" Background="{DynamicResource MahApps.Brushes.Accent}" Padding="16,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="1. Source" Foreground="White" Margin="0,0,8,0"
+                           FontWeight="{Binding CurrentStep, Converter={StaticResource StepFontWeightConverter}, ConverterParameter=1}"/>
+                <TextBlock Text="→" Foreground="White" Margin="0,0,8,0"/>
+                <TextBlock Text="2. Format &amp; Columns" Foreground="White" Margin="0,0,8,0"
+                           FontWeight="{Binding CurrentStep, Converter={StaticResource StepFontWeightConverter}, ConverterParameter=2}"/>
+                <TextBlock Text="→" Foreground="White" Margin="0,0,8,0"/>
+                <TextBlock Text="3. Export" Foreground="White"
+                           FontWeight="{Binding CurrentStep, Converter={StaticResource StepFontWeightConverter}, ConverterParameter=3}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ═══ Step content ═══ -->
+        <Grid Grid.Row="1" Margin="16">
+            
+            <!-- ─── Step 1: Source Selection ─── -->
+            <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource IntEqualsToVisConverter}, ConverterParameter=1}">
+                <TextBlock Text="Select Data Source" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Source Type:" VerticalAlignment="Center" Width="120"/>
+                    <ComboBox ItemsSource="{Binding SourceTypes}" SelectedItem="{Binding SourceType}" Width="200"/>
+                </StackPanel>
+
+                <!-- Table selection -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8"
+                            Visibility="{Binding SourceType, Converter={StaticResource StringEqualsToVisConverter}, ConverterParameter=Table}">
+                    <TextBlock Text="Table:" VerticalAlignment="Center" Width="120"/>
+                    <ComboBox ItemsSource="{Binding AvailableTables}" SelectedItem="{Binding SelectedTable}" 
+                              Width="300" IsEditable="True"/>
+                </StackPanel>
+
+                <!-- WHERE clause for tables -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8"
+                            Visibility="{Binding SourceType, Converter={StaticResource StringEqualsToVisConverter}, ConverterParameter=Table}">
+                    <TextBlock Text="WHERE (optional):" VerticalAlignment="Center" Width="120"/>
+                    <TextBox Text="{Binding WhereClause, UpdateSourceTrigger=PropertyChanged}" Width="400"
+                             mah:TextBoxHelper.Watermark="e.g. status = 'active' AND created_at > '2024-01-01'"/>
+                </StackPanel>
+
+                <!-- Custom query -->
+                <StackPanel Margin="0,0,0,8"
+                            Visibility="{Binding SourceType, Converter={StaticResource StringEqualsToVisConverter}, ConverterParameter=Custom Query}">
+                    <TextBlock Text="SQL Query:" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding CustomQuery, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="120" AcceptsReturn="True" AcceptsTab="True"
+                             FontFamily="Cascadia Code,Consolas,Courier New"
+                             VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                             mah:TextBoxHelper.Watermark="SELECT * FROM ..."/>
+                </StackPanel>
+
+                <Button Content="Preview" Command="{Binding LoadPreviewCommand}" 
+                        Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,4,0,8"
+                        HorizontalAlignment="Left" Padding="16,4"/>
+
+                <TextBlock Text="{Binding PreviewStatus}" Margin="0,0,0,4" Foreground="Gray"/>
+
+                <DataGrid ItemsSource="{Binding PreviewData}" IsReadOnly="True"
+                          AutoGenerateColumns="True" MaxHeight="200"
+                          CanUserAddRows="False" CanUserDeleteRows="False"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"/>
+            </StackPanel>
+
+            <!-- ─── Step 2: Format & Column Selection ─── -->
+            <Grid Visibility="{Binding CurrentStep, Converter={StaticResource IntEqualsToVisConverter}, ConverterParameter=2}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Format &amp; Column Selection" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                <!-- Format options -->
+                <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8">
+                        <TextBlock Text="Format:" VerticalAlignment="Center" Width="80"/>
+                        <ComboBox ItemsSource="{Binding ExportFormats}" SelectedItem="{Binding SelectedFormat}" Width="180"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8">
+                        <TextBlock Text="Encoding:" VerticalAlignment="Center" Width="80"/>
+                        <ComboBox ItemsSource="{Binding Encodings}" SelectedItem="{Binding Encoding}" Width="140"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8">
+                        <TextBlock Text="Delimiter:" VerticalAlignment="Center" Width="80"/>
+                        <ComboBox ItemsSource="{Binding CommonDelimiters}" SelectedItem="{Binding CsvDelimiter}" Width="80"/>
+                    </StackPanel>
+
+                    <CheckBox Content="Include header row" IsChecked="{Binding IncludeHeader}" Margin="0,0,16,8" VerticalAlignment="Center"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8">
+                        <TextBlock Text="NULL as:" VerticalAlignment="Center" Width="60"/>
+                        <TextBox Text="{Binding NullRepresentation}" Width="80"
+                                 mah:TextBoxHelper.Watermark="(empty)"/>
+                    </StackPanel>
+                </WrapPanel>
+
+                <!-- Column selection -->
+                <GroupBox Grid.Row="2" Header="Columns to Export">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                            <Button Content="Select All" Command="{Binding SelectAllCommand}" Padding="12,2" Margin="0,0,8,0"/>
+                            <Button Content="Deselect All" Command="{Binding DeselectAllCommand}" Padding="12,2"/>
+                        </StackPanel>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Columns}" AutoGenerateColumns="False"
+                                  CanUserAddRows="False" CanUserDeleteRows="False"
+                                  HeadersVisibility="Column" GridLinesVisibility="Horizontal">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Header="Include" Binding="{Binding Include, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                                <DataGridTextColumn Header="Column Name" Binding="{Binding ColumnName}" IsReadOnly="True" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
+            <!-- ─── Step 3: Export Execution ─── -->
+            <StackPanel Visibility="{Binding CurrentStep, Converter={StaticResource IntEqualsToVisConverter}, ConverterParameter=3}">
+                <TextBlock Text="Export" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                <!-- File path -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="Save to:" VerticalAlignment="Center" Width="80"/>
+                    <TextBox Text="{Binding OutputFilePath}" Width="500" IsReadOnly="True" Margin="0,0,8,0"/>
+                    <Button Content="Browse..." Click="BrowseExportFile_Click" Padding="12,2"/>
+                </StackPanel>
+
+                <!-- Summary -->
+                <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" 
+                        CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Export Summary" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding SelectedFormat, StringFormat='Format: {0}'}"/>
+                        <TextBlock Text="{Binding TotalRows, StringFormat='Total rows: {0:N0}'}"/>
+                        <TextBlock Text="{Binding Encoding, StringFormat='Encoding: {0}'}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Start button -->
+                <Button Content="Start Export" Command="{Binding StartExportCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        HorizontalAlignment="Left" Padding="24,6" Margin="0,0,0,12"
+                        IsEnabled="{Binding IsExporting, Converter={StaticResource InverseBoolConverter}}"/>
+
+                <!-- Progress -->
+                <ProgressBar Value="{Binding ProgressPercent}" Height="20" Margin="0,0,0,8"
+                             Visibility="{Binding IsExporting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <TextBlock Text="{Binding ExportStatus}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+                <!-- Log -->
+                <GroupBox Header="Export Log" MaxHeight="200">
+                    <ListBox ItemsSource="{Binding ExportLog}" FontFamily="Cascadia Code,Consolas,Courier New" FontSize="11"/>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- ═══ Navigation buttons ═══ -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,8">
+            <Button Content="← Back" Command="{Binding PreviousStepCommand}"
+                    IsEnabled="{Binding CanGoBack}" Padding="16,6" Margin="0,0,8,0"/>
+            <Button Content="Next →" Command="{Binding NextStepCommand}"
+                    IsEnabled="{Binding CanGoNext}" Padding="16,6" Margin="0,0,8,0"
+                    Style="{StaticResource MaterialDesignRaisedButton}"/>
+            <Button Content="Close" Click="Close_Click" Padding="16,6"/>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

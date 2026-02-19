@@ -1,0 +1,150 @@
+<UserControl x:Class="DatabaseClient.App.Views.LogViewerTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:DatabaseClient.App.ViewModels">
+    <UserControl.Resources>
+        <Style x:Key="LevelBadge" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="MinWidth" Value="32"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <ToolBar Grid.Row="0" Style="{DynamicResource MaterialDesignToolBar}">
+            <!-- Level filter toggles -->
+            <TextBlock Text="Levels:" VerticalAlignment="Center" Margin="4,0"/>
+            <ToggleButton Content="VRB" IsChecked="{Binding ShowVerbose}" ToolTip="Verbose"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28" MinWidth="40"/>
+            <ToggleButton Content="DBG" IsChecked="{Binding ShowDebug}" ToolTip="Debug"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28" MinWidth="40"/>
+            <ToggleButton Content="INF" IsChecked="{Binding ShowInformation}" ToolTip="Information"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28" MinWidth="40"/>
+            <ToggleButton Content="WRN" IsChecked="{Binding ShowWarning}" ToolTip="Warning"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28" MinWidth="40"/>
+            <ToggleButton Content="ERR" IsChecked="{Binding ShowError}" ToolTip="Error"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28" MinWidth="40"/>
+            <ToggleButton Content="FTL" IsChecked="{Binding ShowFatal}" ToolTip="Fatal"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28" MinWidth="40"/>
+
+            <Separator/>
+
+            <!-- Search -->
+            <TextBox md:HintAssist.Hint="Search logs..."
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200" Margin="4,0" VerticalAlignment="Center"/>
+
+            <Separator/>
+
+            <!-- Auto-scroll toggle -->
+            <ToggleButton IsChecked="{Binding AutoScroll}" ToolTip="Auto-scroll to latest"
+                          Style="{StaticResource MaterialDesignFlatToggleButton}" Height="28">
+                <md:PackIcon Kind="ArrowDownBold" Width="18" Height="18"/>
+            </ToggleButton>
+
+            <!-- Actions -->
+            <Button Command="{Binding CopyToClipboardCommand}" ToolTip="Copy to Clipboard">
+                <md:PackIcon Kind="ContentCopy" Width="18" Height="18"/>
+            </Button>
+            <Button Command="{Binding ClearLogsCommand}" ToolTip="Clear Logs"
+                    Foreground="OrangeRed">
+                <md:PackIcon Kind="DeleteSweep" Width="18" Height="18"/>
+            </Button>
+        </ToolBar>
+
+        <!-- Log entries list -->
+        <ListView Grid.Row="1" ItemsSource="{Binding FilteredEntries}"
+                  x:Name="LogListView"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  FontFamily="Cascadia Code, Consolas, Courier New"
+                  FontSize="12">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Time" Width="160">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}"
+                                           Foreground="Gray"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Level" Width="48">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding LevelShort}" Style="{StaticResource LevelBadge}"
+                                           x:Name="LevelText"/>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding LevelShort}" Value="VRB">
+                                        <Setter TargetName="LevelText" Property="Foreground" Value="Gray"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LevelShort}" Value="DBG">
+                                        <Setter TargetName="LevelText" Property="Foreground" Value="DodgerBlue"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LevelShort}" Value="INF">
+                                        <Setter TargetName="LevelText" Property="Foreground" Value="LimeGreen"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LevelShort}" Value="WRN">
+                                        <Setter TargetName="LevelText" Property="Foreground" Value="Orange"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LevelShort}" Value="ERR">
+                                        <Setter TargetName="LevelText" Property="Foreground" Value="Red"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LevelShort}" Value="FTL">
+                                        <Setter TargetName="LevelText" Property="Foreground" Value="DarkRed"/>
+                                        <Setter TargetName="LevelText" Property="Background" Value="#40FF0000"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Source" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Source}" Foreground="CornflowerBlue"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Message" Width="600">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Message}" TextWrapping="NoWrap"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Exception}" Foreground="Red"
+                                               TextWrapping="Wrap" FontSize="11"
+                                               Visibility="{Binding Exception, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- Status bar -->
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <TextBlock>
+                    <Run Text="Showing "/>
+                    <Run Text="{Binding FilteredCount, Mode=OneWay}"/>
+                    <Run Text=" of "/>
+                    <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                    <Run Text=" log entries"/>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</UserControl>

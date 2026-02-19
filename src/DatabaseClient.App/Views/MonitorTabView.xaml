@@ -1,0 +1,217 @@
+<UserControl x:Class="DatabaseClient.App.Views.MonitorTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:DatabaseClient.App.ViewModels">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <ToolBarTray Grid.Row="0">
+            <ToolBar>
+                <Button Command="{Binding RefreshAllCommand}" ToolTip="Refresh Now">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Refresh" Width="16" Height="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="Refresh" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Separator/>
+                <CheckBox Content="Auto-Refresh" IsChecked="{Binding AutoRefreshEnabled}" VerticalAlignment="Center" Margin="4,0"/>
+                <TextBlock Text="Interval:" VerticalAlignment="Center" Margin="8,0,4,0"/>
+                <ComboBox ItemsSource="{Binding RefreshIntervalOptions}" 
+                          SelectedItem="{Binding RefreshIntervalSeconds}" 
+                          Width="60" VerticalAlignment="Center"/>
+                <TextBlock Text="s" VerticalAlignment="Center" Margin="2,0,0,0"/>
+                <Separator/>
+                <TextBlock VerticalAlignment="Center" Margin="8,0">
+                    <Run Text="Engine: "/><Run Text="{Binding DatabaseEngine, Mode=OneWay}" FontWeight="SemiBold"/>
+                </TextBlock>
+                <TextBlock VerticalAlignment="Center" Margin="8,0">
+                    <Run Text="Last: "/><Run Text="{Binding LastRefreshTime, Mode=OneWay}"/>
+                </TextBlock>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!-- Summary Cards -->
+        <UniformGrid Grid.Row="1" Columns="5" Margin="8,4">
+            <!-- Server Version -->
+            <Border Background="#E3F2FD" CornerRadius="6" Margin="4" Padding="12,8">
+                <StackPanel>
+                    <TextBlock Text="Server" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="{Binding ServerVersion}" FontSize="13" FontWeight="SemiBold" 
+                               TextTrimming="CharacterEllipsis" ToolTip="{Binding ServerVersion}"/>
+                </StackPanel>
+            </Border>
+            <!-- Uptime -->
+            <Border Background="#E8F5E9" CornerRadius="6" Margin="4" Padding="12,8">
+                <StackPanel>
+                    <TextBlock Text="Uptime" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="{Binding ServerUptime}" FontSize="13" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+            <!-- Database Size -->
+            <Border Background="#FFF3E0" CornerRadius="6" Margin="4" Padding="12,8">
+                <StackPanel>
+                    <TextBlock Text="Database Size" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="{Binding DatabaseSize}" FontSize="13" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+            <!-- Active Connections -->
+            <Border Background="#F3E5F5" CornerRadius="6" Margin="4" Padding="12,8">
+                <StackPanel>
+                    <TextBlock Text="Active Connections" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="{Binding ActiveConnections}" FontSize="18" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+            <!-- Cache Hit Ratio -->
+            <Border Background="#EFEBE9" CornerRadius="6" Margin="4" Padding="12,8">
+                <StackPanel>
+                    <TextBlock Text="Cache Hit Ratio" FontSize="10" Foreground="Gray"/>
+                    <TextBlock Text="{Binding CacheHitRatio}" FontSize="13" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Main Content: TabControl with Processes, Databases, Locks -->
+        <TabControl Grid.Row="2" Margin="8,4">
+            <!-- Processes Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AccountMultiple" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="Processes"/>
+                        <TextBlock Text="{Binding Processes.Count, StringFormat=' ({0})'}" Foreground="Gray"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ToolBar Grid.Row="0">
+                        <Button Command="{Binding KillProcessCommand}" ToolTip="Kill Selected Process"
+                                IsEnabled="{Binding SelectedProcess, Converter={StaticResource InverseBoolConverter}, ConverterParameter=NotNull}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="CloseCircle" Width="14" Height="14" Foreground="Red" VerticalAlignment="Center"/>
+                                <TextBlock Text="Kill Process" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </ToolBar>
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding Processes}"
+                              SelectedItem="{Binding SelectedProcess}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              CanUserSortColumns="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              AlternatingRowBackground="#FAFAFA"
+                              FontFamily="Cascadia Code, Consolas, Courier New"
+                              FontSize="11"
+                              BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="60"/>
+                            <DataGridTextColumn Header="User" Binding="{Binding User}" Width="90"/>
+                            <DataGridTextColumn Header="Database" Binding="{Binding Database}" Width="100"/>
+                            <DataGridTextColumn Header="State" Binding="{Binding State}" Width="80"/>
+                            <DataGridTextColumn Header="Duration (s)" Binding="{Binding DurationSec}" Width="80"/>
+                            <DataGridTextColumn Header="Wait" Binding="{Binding WaitEvent}" Width="80"/>
+                            <DataGridTextColumn Header="Client" Binding="{Binding ClientAddr}" Width="110"/>
+                            <DataGridTextColumn Header="Query" Binding="{Binding Query}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                        <Setter Property="ToolTip" Value="{Binding Query}"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Database Sizes Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Database" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="Databases"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <DataGrid ItemsSource="{Binding DatabaseSizes}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserSortColumns="True"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          AlternatingRowBackground="#FAFAFA"
+                          FontFamily="Cascadia Code, Consolas, Courier New"
+                          FontSize="11"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Database" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="120"/>
+                        <DataGridTextColumn Header="Bytes" Binding="{Binding SizeBytes, StringFormat=N0}" Width="120"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <!-- Locks Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Lock" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock Text="Locks"/>
+                        <TextBlock Text="{Binding Locks.Count, StringFormat=' ({0})'}" Foreground="Gray"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <DataGrid ItemsSource="{Binding Locks}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserSortColumns="True"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          AlternatingRowBackground="#FAFAFA"
+                          FontFamily="Cascadia Code, Consolas, Courier New"
+                          FontSize="11"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="60"/>
+                        <DataGridTextColumn Header="User" Binding="{Binding User}" Width="90"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding LockType}" Width="80"/>
+                        <DataGridTextColumn Header="Mode" Binding="{Binding Mode}" Width="120"/>
+                        <DataGridTextColumn Header="Relation" Binding="{Binding Relation}" Width="120"/>
+                        <DataGridTextColumn Header="Granted" Binding="{Binding Granted}" Width="60"/>
+                        <DataGridTextColumn Header="Query" Binding="{Binding Query}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip" Value="{Binding Query}"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="{DynamicResource MahApps.Brushes.Gray10}" 
+                Padding="8,4" BorderThickness="0,1,0,0" BorderBrush="LightGray">
+            <DockPanel>
+                <ProgressBar Width="80" Height="10" IsIndeterminate="{Binding IsRefreshing}"
+                             Visibility="{Binding IsRefreshing, Converter={StaticResource BoolToVisConverter}}"
+                             DockPanel.Dock="Right" Margin="8,0,0,0"/>
+                <TextBlock Text="{Binding StatusMessage}" TextTrimming="CharacterEllipsis"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

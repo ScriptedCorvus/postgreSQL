@@ -1,0 +1,34 @@
+﻿<Application x:Class="DatabaseClient.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DatabaseClient.App"
+             xmlns:converters="clr-namespace:DatabaseClient.App.Converters"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- MahApps.Metro -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+
+                <!-- MaterialDesign -->
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Teal" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters -->
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisConverter"/>
+            <converters:NullToItalicConverter x:Key="NullToItalicConverter"/>
+            <converters:DatabaseObjectTypeToIconConverter x:Key="ObjectTypeToIconConverter"/>
+            <converters:StringEqualsToVisibilityConverter x:Key="StringEqualsToVisConverter"/>
+            <converters:ThemeModeToStringConverter x:Key="ThemeModeToStringConverter"/>
+            <converters:StringToPackIconKindConverter x:Key="StringToPackIconKindConverter"/>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
+            <converters:IntEqualsToVisibilityConverter x:Key="IntEqualsToVisConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

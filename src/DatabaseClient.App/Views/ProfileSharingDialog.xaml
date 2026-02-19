@@ -1,0 +1,118 @@
+<mah:MetroWindow x:Class="DatabaseClient.App.Views.ProfileSharingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:DatabaseClient.App.ViewModels"
+        Title="Share &amp; Collaborate" 
+        Width="560" Height="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        TitleCharacterCasing="Normal"
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+        d:DataContext="{d:DesignInstance Type=vm:ProfileSharingViewModel}"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <materialDesign:PackIcon Kind="ShareVariant" Width="28" Height="28" 
+                                     VerticalAlignment="Center" Margin="0,0,10,0"
+                                     Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
+            <TextBlock Text="Share &amp; Collaborate" FontSize="20" FontWeight="Light" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Content -->
+        <StackPanel Grid.Row="1">
+            <!-- Mode -->
+            <ComboBox ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}"
+                      materialDesign:HintAssist.Hint="Operation"
+                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                      Margin="0,0,0,12"/>
+
+            <!-- File Path -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}"
+                         materialDesign:HintAssist.Hint="File Path"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,8,0"/>
+                <Button Grid.Column="1" Content="Browse..." Click="BrowseFile_Click"
+                        Style="{StaticResource MaterialDesignOutlinedButton}" Padding="12,4"/>
+            </Grid>
+
+            <!-- Master Key (for encryption) -->
+            <PasswordBox x:Name="MasterKeyBox"
+                         materialDesign:HintAssist.Hint="Master Key (for password encryption)"
+                         Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                         Margin="0,0,0,12"
+                         PasswordChanged="MasterKeyBox_PasswordChanged"/>
+
+            <!-- Replace/Merge option (for import) -->
+            <CheckBox Content="Replace existing data (otherwise merge)" 
+                      IsChecked="{Binding ReplaceExisting}"
+                      Margin="0,0,0,12"/>
+
+            <!-- Connection Selection (for Export Connections) -->
+            <GroupBox Header="Select Connections" Margin="0,0,0,12" MaxHeight="150"
+                      Visibility="{Binding SelectedMode, Converter={StaticResource StringEqualsToVisConverter}, ConverterParameter=Export Connections}">
+                <ListBox ItemsSource="{Binding SelectableConnections}" 
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected}" Margin="4">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Connection.Name}" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding Connection.DatabaseType, StringFormat=' ({0})'}" Opacity="0.6"/>
+                                </StackPanel>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </GroupBox>
+        </StackPanel>
+
+        <!-- Status -->
+        <Border Grid.Row="2" Margin="0,0,0,12" Padding="10" CornerRadius="6"
+                Visibility="{Binding StatusMessage, Converter={StaticResource StringToVisConverter}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#FFF3CD"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSuccess}" Value="True">
+                            <Setter Property="Background" Value="#D4EDDA"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Command="{Binding ExecuteCommand}"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Padding="16,8" Margin="0,0,8,0">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Play" Margin="0,0,6,0"/>
+                    <TextBlock Text="Execute"/>
+                </StackPanel>
+            </Button>
+            <Button Content="Close" IsCancel="True" Click="Close_Click"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" Padding="16,8"/>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

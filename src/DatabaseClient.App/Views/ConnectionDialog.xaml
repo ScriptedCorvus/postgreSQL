@@ -1,0 +1,402 @@
+<mah:MetroWindow x:Class="DatabaseClient.App.Views.ConnectionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:DatabaseClient.App.ViewModels"
+        mc:Ignorable="d"
+        Title="Connection Settings" 
+        Width="560" Height="780"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        TitleCharacterCasing="Normal"
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+        d:DataContext="{d:DesignInstance Type=vm:ConnectionDialogViewModel}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <materialDesign:PackIcon Kind="DatabasePlus" Width="28" Height="28" 
+                                     VerticalAlignment="Center" Margin="0,0,10,0"
+                                     Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
+            <TextBlock Text="Connection Settings" FontSize="20" FontWeight="Light" VerticalAlignment="Center"/>
+            <!-- Show Templates button (visible when template selector is hidden) -->
+            <Button Command="{Binding ShowTemplatesCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Margin="16,0,0,0" VerticalAlignment="Center"
+                    Visibility="{Binding ShowTemplateSelector, Converter={StaticResource InverseBoolToVisConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ViewList" Margin="0,0,4,0"/>
+                    <TextBlock Text="Templates"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Template Selector -->
+        <Border Grid.Row="1" Margin="0,0,0,12" Padding="12" CornerRadius="8"
+                Background="{DynamicResource MaterialDesignCardBackground}"
+                Visibility="{Binding ShowTemplateSelector, Converter={StaticResource BoolToVisConverter}}">
+            <StackPanel>
+                <TextBlock Text="Start from a template" FontSize="14" FontWeight="Medium" Margin="0,0,0,8"/>
+
+                <!-- Category filter -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Category:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox ItemsSource="{Binding TemplateCategories}"
+                              SelectedItem="{Binding SelectedTemplateCategory}"
+                              MinWidth="160"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                              materialDesign:HintAssist.Hint="Filter"
+                              Padding="8,4"/>
+                </StackPanel>
+
+                <!-- Template list -->
+                <ListBox ItemsSource="{Binding FilteredTemplates}"
+                         MaxHeight="180"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         BorderThickness="0"
+                         Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.ApplyTemplateCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    HorizontalContentAlignment="Left"
+                                    Padding="8,6" Margin="0,2"
+                                    Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListBox}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="8" Height="32" CornerRadius="4" Margin="0,0,10,0">
+                                        <Border.Background>
+                                            <SolidColorBrush Color="{Binding ColorTag, FallbackValue=#007ACC}"/>
+                                        </Border.Background>
+                                    </Border>
+                                    <materialDesign:PackIcon Kind="Database" Width="22" Height="22" VerticalAlignment="Center" Margin="0,0,10,0"
+                                                             Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontWeight="Medium" FontSize="13"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="11" Opacity="0.7"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Skip template link -->
+                <Button Content="Skip, configure manually →" 
+                        HorizontalAlignment="Right" Margin="0,6,0,0"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        FontSize="11" Padding="8,2"
+                        Command="{Binding SkipTemplateCommand}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Form -->
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Cloud Provider Help Text -->
+            <Border Grid.Row="0" Margin="0,0,0,8" Padding="10" CornerRadius="6"
+                    Background="#E3F2FD"
+                    Visibility="{Binding CloudHelpText, Converter={StaticResource StringToVisConverter}}">
+                <StackPanel>
+                    <TextBlock Text="{Binding CloudHelpText}" TextWrapping="Wrap" FontSize="12"/>
+                    <TextBlock Margin="0,4,0,0" FontSize="11"
+                               Visibility="{Binding CloudDocumentationUrl, Converter={StaticResource StringToVisConverter}}">
+                        <Hyperlink NavigateUri="{Binding CloudDocumentationUrl}" 
+                                   RequestNavigate="Hyperlink_RequestNavigate">
+                            <Run Text="View documentation →"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+        <TabControl Grid.Row="1" Margin="0,0,0,0">
+            <!-- ═══ General Tab ═══ -->
+            <TabItem Header="General">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,12">
+                    <StackPanel>
+                        <!-- Connection Name -->
+                        <TextBox Text="{Binding ConnectionName, UpdateSourceTrigger=PropertyChanged}" 
+                                 materialDesign:HintAssist.Hint="Connection Name"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Margin="0,0,0,12"/>
+
+                        <!-- Database Type -->
+                        <ComboBox ItemsSource="{Binding DatabaseTypes}" 
+                                  SelectedItem="{Binding SelectedDatabaseType}" 
+                                  materialDesign:HintAssist.Hint="Database Type"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                  Margin="0,0,0,12"/>
+
+                        <!-- Color Tag -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding ColorTag, UpdateSourceTrigger=PropertyChanged}"
+                                     materialDesign:HintAssist.Hint="Color Tag (#hex)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,8,0"/>
+                            <Border Grid.Column="1" Width="32" Height="32" CornerRadius="4"
+                                    BorderThickness="1" BorderBrush="Gray">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding ColorTag, FallbackValue=#007ACC}"/>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+
+                        <!-- Host/Port (hidden for SQLite) -->
+                        <StackPanel Visibility="{Binding IsSqliteSelected, Converter={StaticResource InverseBoolToVisConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}" 
+                                         materialDesign:HintAssist.Hint="Host"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="Port"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            </Grid>
+
+                            <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" 
+                                     materialDesign:HintAssist.Hint="Username"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,12,0,0"/>
+
+                            <PasswordBox x:Name="PasswordBox"
+                                         materialDesign:HintAssist.Hint="Password"
+                                         Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                         Margin="0,12,0,0"/>
+
+                            <TextBox Text="{Binding DefaultDatabase, UpdateSourceTrigger=PropertyChanged}"
+                                     materialDesign:HintAssist.Hint="Default Database"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,12,0,0"/>
+
+                            <!-- Authentication Method -->
+                            <ComboBox ItemsSource="{Binding AuthMethods}"
+                                      SelectedItem="{Binding AuthenticationMethod}"
+                                      materialDesign:HintAssist.Hint="Authentication Method"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      Margin="0,12,0,0"/>
+                        </StackPanel>
+
+                        <!-- SQLite file path -->
+                        <StackPanel Visibility="{Binding IsSqliteSelected, Converter={StaticResource BoolToVisConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding DatabaseFilePath, UpdateSourceTrigger=PropertyChanged}" 
+                                         materialDesign:HintAssist.Hint="Database File Path"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="Browse..." Click="BrowseSqliteFile_Click" 
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Padding="12,4"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ SSL/TLS Tab ═══ -->
+            <TabItem Header="SSL / TLS"
+                     Visibility="{Binding IsSqliteSelected, Converter={StaticResource InverseBoolToVisConverter}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,12">
+                    <StackPanel>
+                        <CheckBox Content="Enable SSL/TLS" IsChecked="{Binding UseSsl}" Margin="0,0,0,16"/>
+
+                        <StackPanel Visibility="{Binding UseSsl, Converter={StaticResource BoolToVisConverter}}">
+                            <ComboBox ItemsSource="{Binding SslModes}"
+                                      SelectedItem="{Binding SslMode}"
+                                      materialDesign:HintAssist.Hint="SSL Mode"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      Margin="0,0,0,12"/>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding SslCaCertificatePath, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="CA Certificate (optional)"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="Browse..." Click="BrowseSslCa_Click"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Padding="12,4"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding SslClientCertificatePath, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="Client Certificate (optional)"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="Browse..." Click="BrowseSslClientCert_Click"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Padding="12,4"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding SslClientKeyPath, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="Client Key (optional)"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="Browse..." Click="BrowseSslClientKey_Click"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Padding="12,4"/>
+                            </Grid>
+
+                            <TextBlock TextWrapping="Wrap" Opacity="0.6" FontSize="11" Margin="0,4">
+                                <Run Text="Require: Connect only via SSL. VerifyCA: Verify server certificate. VerifyFull: Verify server certificate and hostname."/>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ SSH Tunnel Tab ═══ -->
+            <TabItem Header="SSH Tunnel"
+                     Visibility="{Binding IsSqliteSelected, Converter={StaticResource InverseBoolToVisConverter}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,12">
+                    <StackPanel>
+                        <CheckBox Content="Use SSH Tunnel" IsChecked="{Binding UseSshTunnel}" Margin="0,0,0,16"/>
+                        <StackPanel Visibility="{Binding UseSshTunnel, Converter={StaticResource BoolToVisConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding SshHost, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="SSH Host"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SshPort, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="SSH Port"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            </Grid>
+                            <TextBox Text="{Binding SshUsername, UpdateSourceTrigger=PropertyChanged}"
+                                     materialDesign:HintAssist.Hint="SSH Username"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,8,0,0"/>
+                            <PasswordBox x:Name="SshPasswordBox"
+                                         materialDesign:HintAssist.Hint="SSH Password"
+                                         Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                         Margin="0,8,0,0"/>
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding SshPrivateKeyPath, UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.Hint="Private Key File (optional)"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="Browse..." Click="BrowseSshKey_Click"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Padding="12,4"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+        </Grid>
+
+        <!-- Test Result -->
+        <Border Grid.Row="3" Margin="0,12,0,8" Padding="10" CornerRadius="6"
+                Visibility="{Binding TestResultMessage, Converter={StaticResource StringToVisConverter}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#FFF3CD"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding TestSucceeded}" Value="True">
+                            <Setter Property="Background" Value="#D4EDDA"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <materialDesign:PackIcon.Style>
+                        <Style TargetType="materialDesign:PackIcon">
+                            <Setter Property="Kind" Value="AlertCircle"/>
+                            <Setter Property="Foreground" Value="#856404"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TestSucceeded}" Value="True">
+                                    <Setter Property="Kind" Value="CheckCircle"/>
+                                    <Setter Property="Foreground" Value="#155724"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </materialDesign:PackIcon.Style>
+                </materialDesign:PackIcon>
+                <TextBlock Text="{Binding TestResultMessage}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Command="{Binding SaveAsTemplateCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Padding="12,8" Margin="0,0,8,0"
+                    ToolTip="Save current settings as a reusable template">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="BookmarkPlus" Margin="0,0,4,0"/>
+                    <TextBlock Text="Save as Template"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding TestConnectionCommand}" 
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Padding="16,8" Margin="0,0,8,0">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="LanConnect" Margin="0,0,6,0"/>
+                    <TextBlock Text="Test Connection"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding ConfirmCommand}" 
+                    IsDefault="True" 
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Padding="16,8" Margin="0,0,8,0">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,6,0"/>
+                    <TextBlock Text="Save"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding CancelCommand}" 
+                    IsCancel="True"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Padding="16,8">
+                <TextBlock Text="Cancel"/>
+            </Button>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

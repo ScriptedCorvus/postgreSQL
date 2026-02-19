@@ -1,0 +1,132 @@
+<UserControl x:Class="DatabaseClient.App.Views.DiagnosticsTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:DatabaseClient.App.ViewModels">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
+        <StackPanel MaxWidth="800">
+            <!-- Header -->
+            <DockPanel Margin="0,0,0,16">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Button Command="{Binding RefreshCommand}" Margin="0,0,8,0"
+                            Style="{StaticResource MaterialDesignFlatButton}" ToolTip="Refresh">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Refresh" Width="16" Height="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="Refresh" Margin="4,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding CopyToClipboardCommand}" 
+                            Style="{StaticResource MaterialDesignFlatButton}" ToolTip="Copy All to Clipboard">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ContentCopy" Width="16" Height="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="Copy" Margin="4,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <TextBlock Text="Application Diagnostics" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <!-- System Information -->
+            <materialDesign:Card Padding="16" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="System Information" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="App Version:" Foreground="Gray"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ApplicationVersion}" FontFamily="Consolas"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text=".NET Runtime:" Foreground="Gray" Margin="0,4,0,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DotNetVersion}" FontFamily="Consolas" Margin="0,4,0,0"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="OS:" Foreground="Gray" Margin="0,4,0,0"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OsVersion}" FontFamily="Consolas" Margin="0,4,0,0"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Architecture:" Foreground="Gray" Margin="0,4,0,0"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ProcessArchitecture}" FontFamily="Consolas" Margin="0,4,0,0"/>
+                    </Grid>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Memory -->
+            <materialDesign:Card Padding="16" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Memory" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <UniformGrid Columns="5">
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Managed Heap" FontSize="10" Foreground="Gray"/>
+                            <TextBlock Text="{Binding TotalMemory}" FontSize="16" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Working Set" FontSize="10" Foreground="Gray"/>
+                            <TextBlock Text="{Binding WorkingSet}" FontSize="16" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Gen0 Collections" FontSize="10" Foreground="Gray"/>
+                            <TextBlock Text="{Binding Gen0Collections}" FontSize="16" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Gen1 Collections" FontSize="10" Foreground="Gray"/>
+                            <TextBlock Text="{Binding Gen1Collections}" FontSize="16" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="Gen2 Collections" FontSize="10" Foreground="Gray"/>
+                            <TextBlock Text="{Binding Gen2Collections}" FontSize="16" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </UniformGrid>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Connections -->
+            <materialDesign:Card Padding="16" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8">
+                        <Run Text="Active Connections: "/><Run Text="{Binding ActiveConnectionCount, Mode=OneWay}" FontWeight="Bold"/>
+                    </TextBlock>
+                    <ItemsControl ItemsSource="{Binding ActiveConnectionIds}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="11" Foreground="Gray" Margin="8,2"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="No active connections" Foreground="Gray" FontStyle="Italic"
+                               Visibility="{Binding ActiveConnectionCount, Converter={StaticResource IntEqualsToVisConverter}, ConverterParameter=0}"/>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Provider Versions -->
+            <materialDesign:Card Padding="16" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Library Versions" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <DataGrid ItemsSource="{Binding ProviderVersions}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="None"
+                              BorderThickness="0"
+                              CanUserSortColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Library" Binding="{Binding Name}" Width="200"/>
+                            <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontFamily" Value="Consolas"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
