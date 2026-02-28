@@ -115,6 +115,8 @@ public partial class TableDataTabViewModel : TabViewModelBase
 
             if (result.IsSuccessful && result.ResultSet is not null)
             {
+                // Normalize BEFORE binding so AutoGeneratingColumn sees correct ReadOnly flags
+                NormalizeColumnEditability(result.ResultSet);
                 Data = result.ResultSet;
                 ClearPendingChanges();
                 StatusMessage = $"Loaded {Data.Rows.Count} rows (page {CurrentPage}/{TotalPages}, total: {TotalRows})";
@@ -259,6 +261,46 @@ public partial class TableDataTabViewModel : TabViewModelBase
         }
     }
 
+    public async Task ApplyRowChangeAsync(int rowIndex)
+    {
+        if (_provider is null || Data is null) return;
+        if (rowIndex < 0 || rowIndex >= Data.Rows.Count) return;
+
+        var row = Data.Rows[rowIndex];
+
+        try
+        {
+            IsLoading = true;
+
+            if (_newRows.Contains(row))
+            {
+                var insertSql = GenerateInsertSql(row);
+                await _provider.ExecuteNonQueryAsync(insertSql);
+                _newRows.Remove(row);
+                _modifiedRows.Remove(rowIndex);
+                StatusMessage = "Row inserted successfully.";
+            }
+            else
+            {
+                var updateSql = GenerateUpdateSql(row);
+                await _provider.ExecuteNonQueryAsync(updateSql);
+                row.AcceptChanges();
+                _modifiedRows.Remove(rowIndex);
+                StatusMessage = "Row updated successfully.";
+            }
+
+            UpdatePendingChangesCount();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error applying row: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
     [RelayCommand]
     private void AddNewRow()
     {
@@ -299,12 +341,11 @@ public partial class TableDataTabViewModel : TabViewModelBase
     [RelayCommand(CanExecute = nameof(CanApplyChanges))]
     private async Task ApplyChanges()
     {
-        if (_provider is null || Data is null || !HasPrimaryKey) return;
+        if (_provider is null || Data is null) return;
 
         try
         {
             IsLoading = true;
-            var pkColumns = _columns.Where(c => c.IsPrimaryKey).ToList();
             var errors = new List<string>();
             int successCount = 0;
 
@@ -313,7 +354,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
             {
                 if (rowIdx >= Data.Rows.Count) continue;
                 var row = Data.Rows[rowIdx];
-                var sql = GenerateDeleteSql(row, pkColumns);
+                var sql = GenerateDeleteSql(row);
                 try
                 {
                     await _provider.ExecuteNonQueryAsync(sql);
@@ -331,7 +372,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
                 if (rowIdx >= Data.Rows.Count) continue;
                 var row = Data.Rows[rowIdx];
                 if (_newRows.Contains(row)) continue; // handled as INSERT
-                var sql = GenerateUpdateSql(row, pkColumns);
+                var sql = GenerateUpdateSql(row);
                 try
                 {
                     await _provider.ExecuteNonQueryAsync(sql);
@@ -380,7 +421,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
         }
     }
 
-    private bool CanApplyChanges() => PendingChangesCount > 0 && HasPrimaryKey;
+    private bool CanApplyChanges() => PendingChangesCount > 0;
 
     [RelayCommand]
     private async Task DiscardChanges()
@@ -407,29 +448,31 @@ public partial class TableDataTabViewModel : TabViewModelBase
 
     #region SQL Generation
 
-    private string GenerateDeleteSql(DataRow row, List<ColumnInfo> pkColumns)
+    private string GenerateDeleteSql(DataRow row)
     {
-        var sb = new StringBuilder();
-        sb.Append($"DELETE FROM {QuoteIdentifier(_tableName)} WHERE ");
-        sb.Append(BuildWhereClause(row, pkColumns));
-        return sb.ToString();
+        return $"DELETE FROM {QuoteIdentifier(_tableName)} WHERE {BuildWhereClauseForRow(row)}";
     }
 
-    private string GenerateUpdateSql(DataRow row, List<ColumnInfo> pkColumns)
+    private string GenerateUpdateSql(DataRow row)
     {
         var sb = new StringBuilder();
         sb.Append($"UPDATE {QuoteIdentifier(_tableName)} SET ");
 
+        // When there's a PK, skip PK columns from SET; otherwise include all editable columns
+        var pkNames = HasPrimaryKey
+            ? new HashSet<string>(_columns.Where(c => c.IsPrimaryKey).Select(c => c.Name), StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         var setClauses = new List<string>();
         foreach (DataColumn col in Data!.Columns)
         {
-            if (pkColumns.Any(pk => pk.Name.Equals(col.ColumnName, StringComparison.OrdinalIgnoreCase)))
-                continue;
+            if (col.ReadOnly) continue;
+            if (pkNames.Contains(col.ColumnName)) continue;
             setClauses.Add($"{QuoteIdentifier(col.ColumnName)} = {FormatValue(row[col])}");
         }
         sb.Append(string.Join(", ", setClauses));
         sb.Append(" WHERE ");
-        sb.Append(BuildWhereClause(row, pkColumns));
+        sb.Append(BuildWhereClauseForRow(row));
         return sb.ToString();
     }
 
@@ -454,18 +497,37 @@ public partial class TableDataTabViewModel : TabViewModelBase
         return sb.ToString();
     }
 
-    private string BuildWhereClause(DataRow row, List<ColumnInfo> pkColumns)
+    /// <summary>Builds a WHERE clause using PK columns if available, otherwise all columns with original values.</summary>
+    private string BuildWhereClauseForRow(DataRow row)
     {
-        var conditions = new List<string>();
-        foreach (var pk in pkColumns)
+        if (HasPrimaryKey)
         {
-            var value = row[pk.Name];
-            if (value == DBNull.Value || value is null)
-                conditions.Add($"{QuoteIdentifier(pk.Name)} IS NULL");
-            else
-                conditions.Add($"{QuoteIdentifier(pk.Name)} = {FormatValue(value)}");
+            var pkColumns = _columns.Where(c => c.IsPrimaryKey).ToList();
+            var conditions = new List<string>();
+            foreach (var pk in pkColumns)
+            {
+                var value = row.HasVersion(DataRowVersion.Original) ? row[pk.Name, DataRowVersion.Original] : row[pk.Name];
+                if (value == DBNull.Value || value is null)
+                    conditions.Add($"{QuoteIdentifier(pk.Name)} IS NULL");
+                else
+                    conditions.Add($"{QuoteIdentifier(pk.Name)} = {FormatValue(value)}");
+            }
+            return string.Join(" AND ", conditions);
         }
-        return string.Join(" AND ", conditions);
+        else
+        {
+            // No PK: match all columns using original (pre-edit) values
+            var conditions = new List<string>();
+            foreach (DataColumn col in row.Table.Columns)
+            {
+                var value = row.HasVersion(DataRowVersion.Original) ? row[col, DataRowVersion.Original] : row[col];
+                if (value == DBNull.Value || value is null)
+                    conditions.Add($"{QuoteIdentifier(col.ColumnName)} IS NULL");
+                else
+                    conditions.Add($"{QuoteIdentifier(col.ColumnName)} = {FormatValue(value)}");
+            }
+            return string.Join(" AND ", conditions);
+        }
     }
 
     private static string FormatValue(object value)
@@ -490,6 +552,18 @@ public partial class TableDataTabViewModel : TabViewModelBase
             DatabaseType.MySQL or DatabaseType.MariaDB => $"`{name}`",
             _ => $"\"{name}\""
         };
+    }
+
+    private void NormalizeColumnEditability(DataTable table)
+    {
+        var editableColumns = new HashSet<string>(
+            _columns.Select(c => c.Name),
+            StringComparer.OrdinalIgnoreCase);
+
+        foreach (DataColumn column in table.Columns)
+        {
+            column.ReadOnly = !editableColumns.Contains(column.ColumnName);
+        }
     }
 
     #endregion

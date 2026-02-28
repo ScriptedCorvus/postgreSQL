@@ -87,7 +87,11 @@ public sealed class GlobalExceptionHandler
         Application.Current?.Dispatcher.Invoke(() =>
         {
             var dialog = new Views.ErrorDialog(title, friendlyMessage, technicalDetails, isFatal);
-            dialog.Owner = Application.Current.MainWindow;
+            var owner = Application.Current?.MainWindow;
+            if (owner is { IsLoaded: true })
+            {
+                dialog.Owner = owner;
+            }
             dialog.ShowDialog();
         });
     }

@@ -10,9 +10,9 @@
         xmlns:views="clr-namespace:DatabaseClient.App.Views"
         mc:Ignorable="d"
         Title="{Binding ApplicationTitle}" 
+        Icon="Resources/dbClient.ico"
         Height="768" Width="1280"
         WindowStartupLocation="CenterScreen"
-        WindowState="Maximized"
         TitleCharacterCasing="Normal"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
@@ -25,107 +25,317 @@
         <KeyBinding Key="OemComma" Modifiers="Ctrl" Command="{Binding OpenSettingsCommand}" />
     </mah:MetroWindow.InputBindings>
 
+    <mah:MetroWindow.Resources>
+        <!-- ═══ Ribbon styles (Word 2024-like) ═══ -->
+        <Style x:Key="RibbonLargeButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="Padding" Value="6,6"/>
+            <Setter Property="Margin" Value="1,0"/>
+            <Setter Property="MinWidth" Value="60"/>
+            <Setter Property="MinHeight" Value="76"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#14000000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RibbonSmallButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Margin" Value="1,1"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="MinHeight" Value="26"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#14000000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RibbonGroupSeparator" TargetType="Border">
+            <Setter Property="Width" Value="1"/>
+            <Setter Property="Margin" Value="6,4,6,14"/>
+            <Setter Property="Background" Value="#22000000"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+        </Style>
+    </mah:MetroWindow.Resources>
+
     <DockPanel LastChildFill="True">
         
-        <!-- ═══ Top Toolbar ═══ -->
-        <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar Band="0" BandIndex="0">
-                <Button Command="{Binding NewConnectionCommand}" ToolTip="New Connection (Ctrl+Shift+N)" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="DatabasePlus" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="New Connection" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding NewQueryTabCommand}" ToolTip="New Query (Ctrl+T)" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="CodeBraces" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="New Query" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding CloseAllTabsCommand}" ToolTip="Close All Tabs" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="TabRemove" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Close All" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding OpenQueryHistoryCommand}" ToolTip="Query History (Ctrl+Shift+H)" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="History" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="History" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding OpenSnippetsCommand}" ToolTip="SQL Snippets" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="CodeBracesBox" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Snippets" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding OpenSettingsCommand}" ToolTip="Settings (Ctrl+,)" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Cog" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Settings" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding OpenProfileSharingCommand}" ToolTip="Share &amp; Collaborate" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="ShareVariant" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Share" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding OpenDataComparisonCommand}" ToolTip="Compare &amp; Sync Data" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="CompareArrows" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Compare" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding OpenSchemaComparisonCommand}" ToolTip="Compare &amp; Sync Schema" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="DatabaseSync" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Schema" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding OpenSchedulerCommand}" ToolTip="Task Scheduler" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="CalendarClock" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Scheduler" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding ImportConnectionsCommand}" ToolTip="Import Connections" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="DatabaseImport" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Import" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding ExportConnectionsCommand}" ToolTip="Export Connections" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="DatabaseExport" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Export" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Command="{Binding OpenLogViewerCommand}" ToolTip="Application Log Viewer" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="TextBoxSearch" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Logs" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding OpenDiagnosticsCommand}" ToolTip="Application Diagnostics" Padding="8,4">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="InformationOutline" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Text="Diagnostics" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding ForceGarbageCollectionCommand}" ToolTip="Force Garbage Collection" Padding="8,4">
-                    <materialDesign:PackIcon Kind="Broom" Width="18" Height="18"/>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
+        <!-- ═══ Ribbon (Word 2024-style) ═══ -->
+        <Border DockPanel.Dock="Top" BorderThickness="0,0,0,1" BorderBrush="#18000000">
+            <TabControl x:Name="RibbonTabControl" 
+                        Background="Transparent" Padding="0" BorderThickness="0"
+                        TabStripPlacement="Top">
+                <TabControl.Resources>
+                    <!-- Modern flat tab header style -->
+                    <Style TargetType="TabItem">
+                        <Setter Property="Padding" Value="14,6"/>
+                        <Setter Property="FontSize" Value="12.5"/>
+                        <Setter Property="FontWeight" Value="Normal"/>
+                        <Setter Property="Foreground" Value="#555"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border x:Name="TabBorder" Padding="{TemplateBinding Padding}" 
+                                            Background="{TemplateBinding Background}" Cursor="Hand">
+                                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Center"/>
+                                        <Border.Effect>
+                                            <DropShadowEffect ShadowDepth="0" BlurRadius="0" Opacity="0"/>
+                                        </Border.Effect>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="TabBorder" Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter TargetName="TabBorder" Property="BorderThickness" Value="0,0,0,2.5"/>
+                                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="False"/>
+                                                <Condition Property="IsMouseOver" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="TabBorder" Property="Background" Value="#0A000000"/>
+                                            <Setter Property="Foreground" Value="#333"/>
+                                        </MultiTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- ══ FILE (Backstage-style dropdown) ══ -->
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="File" FontWeight="SemiBold"/>
+                    </TabItem.Header>
+                    <Border Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="12,8" MinHeight="108">
+                        <WrapPanel VerticalAlignment="Center">
+                            <!-- Group: Connection -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding NewConnectionCommand}" ToolTip="New Connection (Ctrl+Shift+N)" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="DatabasePlus" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="New" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Connection" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Connection" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource RibbonGroupSeparator}"/>
+
+                            <!-- Group: Import/Export -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding ImportConnectionsCommand}" ToolTip="Import Connections" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="Import" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Import" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Command="{Binding ExportConnectionsCommand}" ToolTip="Export Connections" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="Export" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Export" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Connections" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource RibbonGroupSeparator}"/>
+
+                            <!-- Group: Settings / Exit -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding OpenSettingsCommand}" ToolTip="Settings (Ctrl+,)" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="Cog" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Settings" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Click="MenuExit_Click" ToolTip="Exit Application" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="ExitToApp" Width="26" Height="26" HorizontalAlignment="Center" Foreground="#E53935"/>
+                                            <TextBlock Text="Exit" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Application" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </Border>
+                </TabItem>
+
+                <!-- ══ HOME ══ -->
+                <TabItem Header="Home" IsSelected="True">
+                    <Border Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="12,8" MinHeight="108">
+                        <WrapPanel VerticalAlignment="Center">
+                            <!-- Group: New -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding NewConnectionCommand}" ToolTip="New Connection (Ctrl+Shift+N)" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="DatabasePlus" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="New" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Connection" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Command="{Binding NewQueryTabCommand}" ToolTip="New Query (Ctrl+T)" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="CodeBraces" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="New" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Query" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="New" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource RibbonGroupSeparator}"/>
+
+                            <!-- Group: Clipboard / Edit -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding CloseAllTabsCommand}" ToolTip="Close All Tabs" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="TabRemove" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Close" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="All" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Tabs" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource RibbonGroupSeparator}"/>
+
+                            <!-- Group: History / Snippets -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding OpenQueryHistoryCommand}" ToolTip="Query History (Ctrl+Shift+H)" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="History" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="History" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Command="{Binding OpenSnippetsCommand}" ToolTip="SQL Snippets" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="CodeBracesBox" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Snippets" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Command="{Binding OpenProfileSharingCommand}" ToolTip="Share Profiles" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="ShareVariant" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Share" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Profiles" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Library" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </Border>
+                </TabItem>
+
+                <!-- ══ TOOLS ══ -->
+                <TabItem Header="Tools">
+                    <Border Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="12,8" MinHeight="108">
+                        <WrapPanel VerticalAlignment="Center">
+                            <!-- Group: Compare -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding OpenDataComparisonCommand}" ToolTip="Compare Data" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="SwapHorizontal" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Compare" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Data" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Command="{Binding OpenSchemaComparisonCommand}" ToolTip="Compare Schema" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="DatabaseSync" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Compare" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Schema" HorizontalAlignment="Center" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Comparison" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource RibbonGroupSeparator}"/>
+
+                            <!-- Group: Automation -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding OpenSchedulerCommand}" ToolTip="Task Scheduler" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="CalendarClock" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Scheduler" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Automation" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource RibbonGroupSeparator}"/>
+
+                            <!-- Group: System -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                                    <StackPanel>
+                                        <Button Command="{Binding ForceGarbageCollectionCommand}" ToolTip="Force Garbage Collection" Style="{StaticResource RibbonSmallButton}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Broom" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                <TextBlock Text="Garbage Collection" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Text="System" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </Border>
+                </TabItem>
+
+                <!-- ══ VIEW ══ -->
+                <TabItem Header="View">
+                    <Border Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="12,8" MinHeight="108">
+                        <WrapPanel VerticalAlignment="Center">
+                            <!-- Group: Panels -->
+                            <StackPanel Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding OpenLogViewerCommand}" ToolTip="Application Logs" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="TextBoxSearchOutline" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Logs" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Command="{Binding OpenDiagnosticsCommand}" ToolTip="Diagnostics &amp; About" Style="{StaticResource RibbonLargeButton}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="InformationOutline" Width="26" Height="26" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Diagnostics" HorizontalAlignment="Center" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Information" FontSize="10" Foreground="#888" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </Border>
+                </TabItem>
+            </TabControl>
+        </Border>
 
         <!-- ═══ Bottom Status Bar ═══ -->
         <StatusBar DockPanel.Dock="Bottom" Height="28"
@@ -188,13 +398,21 @@
                           ItemsSource="{Binding FilteredConnections}" 
                           BorderThickness="0"
                           Padding="4"
+                          TreeViewItem.Expanded="ConnectionTreeItem_Expanded"
+                          PreviewMouseLeftButtonDown="ConnectionTree_PreviewMouseLeftButtonDown"
+                          PreviewMouseDoubleClick="ConnectionTree_PreviewMouseDoubleClick"
                           VirtualizingStackPanel.IsVirtualizing="True"
                           VirtualizingStackPanel.VirtualizationMode="Recycling">
                     <TreeView.Resources>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="Padding" Value="2,1"/>
+                            <Setter Property="Margin" Value="0"/>
+                        </Style>
+
                         <!-- Connection Node -->
                         <HierarchicalDataTemplate DataType="{x:Type vm:ConnectionNodeViewModel}"
                                                   ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" Margin="2">
+                            <StackPanel Orientation="Horizontal" Margin="1">
                                 <StackPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Connect" Command="{Binding ConnectCommand}">
@@ -260,7 +478,7 @@
                         <!-- Database Node -->
                         <HierarchicalDataTemplate DataType="{x:Type vm:DatabaseNodeViewModel}"
                                                   ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" Margin="2">
+                            <StackPanel Orientation="Horizontal" Margin="1">
                                 <StackPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Open New Query" Command="{Binding OpenNewQueryCommand}">
@@ -301,7 +519,7 @@
                         <!-- Folder Node -->
                         <HierarchicalDataTemplate DataType="{x:Type vm:FolderNodeViewModel}"
                                                   ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" Margin="2">
+                            <StackPanel Orientation="Horizontal" Margin="1">
                                 <materialDesign:PackIcon Kind="{Binding FolderIcon}" Width="16" Height="16"
                                                          Foreground="#F5A623"
                                                          VerticalAlignment="Center" Margin="0,0,4,0"/>
@@ -315,7 +533,7 @@
                         <!-- Table Node (with Select Top) - expandable with Columns/Indexes -->
                         <HierarchicalDataTemplate DataType="{x:Type vm:TableNodeViewModel}"
                                                    ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" Margin="2">
+                            <StackPanel Orientation="Horizontal" Margin="1">
                                 <StackPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Open Data" Command="{Binding OpenDataCommand}">

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using DatabaseClient.App.Services;
@@ -181,6 +182,11 @@ public partial class MainWindow : MetroWindow
         dialog.ShowDialog();
     }
 
+    private void MenuExit_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
     // ── Tab Drag & Drop Reordering ─────────────────────────────────────────
 
     private Point _tabDragStartPoint;
@@ -248,6 +254,57 @@ public partial class MainWindow : MetroWindow
         if (oldIndex < 0 || newIndex < 0) return;
 
         vm.Tabs.Move(oldIndex, newIndex);
+    }
+
+    private void ConnectionTreeItem_Expanded(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is not TreeViewItem item) return;
+
+        switch (item.DataContext)
+        {
+            case ConnectionNodeViewModel connectionNode:
+                connectionNode.IsExpanded = true;
+                break;
+            case DatabaseNodeViewModel databaseNode:
+                databaseNode.IsExpanded = true;
+                break;
+            case TableNodeViewModel tableNode:
+                tableNode.IsExpanded = true;
+                break;
+            case FolderNodeViewModel folderNode:
+                folderNode.IsExpanded = true;
+                break;
+        }
+    }
+
+    private void ConnectionTree_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject source) return;
+
+        var item = FindParent<TreeViewItem>(source);
+        if (item?.DataContext is not TableNodeViewModel) return;
+
+        // Keep default toggle behavior only when user clicks the expander arrow.
+        if (FindParent<ToggleButton>(source) is not null) return;
+
+        item.IsSelected = true;
+        e.Handled = true;
+    }
+
+    private void ConnectionTree_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject source) return;
+
+        var item = FindParent<TreeViewItem>(source);
+        if (item?.DataContext is not TableNodeViewModel tableNode) return;
+
+        if (FindParent<ToggleButton>(source) is not null) return;
+
+        if (tableNode.OpenDataCommand.CanExecute(null))
+        {
+            tableNode.OpenDataCommand.Execute(null);
+            e.Handled = true;
+        }
     }
 
     private static T? FindParent<T>(DependencyObject child) where T : DependencyObject

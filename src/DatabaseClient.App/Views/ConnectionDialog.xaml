@@ -72,10 +72,11 @@
                                     CommandParameter="{Binding}"
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     HorizontalContentAlignment="Left"
-                                    Padding="8,6" Margin="0,2"
+                                    Padding="8,8" Margin="0,2"
+                                    MinHeight="54"
                                     Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListBox}}">
                                 <StackPanel Orientation="Horizontal">
-                                    <Border Width="8" Height="32" CornerRadius="4" Margin="0,0,10,0">
+                                    <Border Width="8" Height="40" CornerRadius="4" Margin="0,0,10,0">
                                         <Border.Background>
                                             <SolidColorBrush Color="{Binding ColorTag, FallbackValue=#007ACC}"/>
                                         </Border.Background>
@@ -84,7 +85,8 @@
                                                              Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Name}" FontWeight="Medium" FontSize="13"/>
-                                        <TextBlock Text="{Binding Description}" FontSize="11" Opacity="0.7"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="11" Opacity="0.7"
+                                                   TextWrapping="Wrap" MaxWidth="420"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Button>
@@ -127,7 +129,7 @@
         <TabControl Grid.Row="1" Margin="0,0,0,0">
             <!-- ═══ General Tab ═══ -->
             <TabItem Header="General">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,15">
                     <StackPanel>
                         <!-- Connection Name -->
                         <TextBox Text="{Binding ConnectionName, UpdateSourceTrigger=PropertyChanged}" 
@@ -222,7 +224,7 @@
             <!-- ═══ SSL/TLS Tab ═══ -->
             <TabItem Header="SSL / TLS"
                      Visibility="{Binding IsSqliteSelected, Converter={StaticResource InverseBoolToVisConverter}}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,15">
                     <StackPanel>
                         <CheckBox Content="Enable SSL/TLS" IsChecked="{Binding UseSsl}" Margin="0,0,0,16"/>
 
@@ -286,7 +288,7 @@
             <!-- ═══ SSH Tunnel Tab ═══ -->
             <TabItem Header="SSH Tunnel"
                      Visibility="{Binding IsSqliteSelected, Converter={StaticResource InverseBoolToVisConverter}}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,15">
                     <StackPanel>
                         <CheckBox Content="Use SSH Tunnel" IsChecked="{Binding UseSshTunnel}" Margin="0,0,0,16"/>
                         <StackPanel Visibility="{Binding UseSshTunnel, Converter={StaticResource BoolToVisConverter}}">

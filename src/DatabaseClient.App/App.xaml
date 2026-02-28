@@ -29,6 +29,8 @@
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
             <converters:IntEqualsToVisibilityConverter x:Key="IntEqualsToVisConverter"/>
+            <converters:StepFontWeightConverter x:Key="StepFontWeightConverter"/>
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,5 +1,107 @@
 [
   {
+    "version": "0.2.1",
+    "build": 11,
+    "date": "2026-02-20",
+    "changes": [
+      "Increased ribbon panel MinHeight from 90 to 108 and button MinHeight from 66 to 76 to accommodate two-line button labels without clipping.",
+      "App no longer starts maximized — opens at 1280x768 centered on screen."
+    ]
+  },
+  {
+    "version": "0.2.0",
+    "build": 10,
+    "date": "2026-02-20",
+    "changes": [
+      "Replaced classic menu bar + toolbar with a Word 2024-style Ribbon UI with tabbed groups.",
+      "Ribbon tabs: File (connections, import/export, settings, exit), Home (new connection/query, close all, history, snippets, share profiles), Tools (compare data/schema, scheduler, GC), View (logs, diagnostics).",
+      "Each ribbon group has large icon buttons with labels and a group title below, separated by vertical dividers.",
+      "Tab headers use a modern flat style with accent-colored underline for the selected tab and hover effect.",
+      "No new dependencies added — built entirely with native WPF TabControl + MaterialDesign + MahApps styles."
+    ]
+  },
+  {
+    "version": "0.1.9",
+    "build": 9,
+    "date": "2026-02-20",
+    "changes": [
+      "Fixed cell values reverting on Apply Changes: DataGrid edit is now committed (CommitEdit) before generating SQL, and edit template uses UpdateSourceTrigger.PropertyChanged so DataRow always has current value.",
+      "Editing a cell without changing its value no longer marks the row as modified: CellEditEnding now compares old vs new value before marking.",
+      "Apply Changes button moved to Click handler in code-behind to ensure DataGrid edit commit before SQL execution."
+    ]
+  },
+  {
+    "version": "0.1.8",
+    "build": 8,
+    "date": "2026-02-20",
+    "changes": [
+      "Fixed column editability: NormalizeColumnEditability now runs BEFORE DataGrid binding so AutoGeneratingColumn sees correct ReadOnly flags, fixing double-click editing.",
+      "Enabled editing on tables without primary keys using all-column matching for UPDATE/DELETE WHERE clauses with original row values.",
+      "Fixed Delete Row context menu binding (PlacementTarget) so it works correctly across the ContextMenu visual tree.",
+      "Added row numbers in row headers for easier row selection (click header number to select entire row).",
+      "Softened no-PK warning from 'editing disabled' to 'updates use all-column matching'.",
+      "Row changes now call AcceptChanges() after successful save to track correct original values for subsequent edits."
+    ]
+  },
+  {
+    "version": "0.1.7",
+    "build": 7,
+    "date": "2026-02-20",
+    "changes": [
+      "Fixed false read-only behavior in table editor by normalizing DataTable column editability from real table metadata.",
+      "Data grid column edit mode now relies on normalized column flags so editable columns like claim_text are no longer blocked by provider schema metadata."
+    ]
+  },
+  {
+    "version": "0.1.6",
+    "build": 6,
+    "date": "2026-02-20",
+    "changes": [
+      "Enabled double-click editing in table cells with explicit BeginEdit behavior in the data grid.",
+      "Set NULL now handles read-only columns safely and shows an informative message instead of throwing exceptions.",
+      "Enhanced column headers with data-type icon + size metadata and set initial column widths with a 256px cap while keeping user resize flexibility.",
+      "Increased ribbon height and button sizing to prevent icon clipping in the main window."
+    ]
+  },
+  {
+    "version": "0.1.5",
+    "build": 5,
+    "date": "2026-02-20",
+    "changes": [
+      "Added Enter-to-save behavior in table data grid: pressing Enter commits the current edit and executes SQL for the current row immediately.",
+      "Implemented row-level persistence path for inline editor to apply single-row INSERT/UPDATE without waiting for full Apply Changes."
+    ]
+  },
+  {
+    "version": "0.1.4",
+    "build": 4,
+    "date": "2026-02-20",
+    "changes": [
+      "TreeView table interaction updated: double-click opens data tab and table row click/double-click no longer triggers default expand/collapse behavior.",
+      "Main window top area redesigned with menu bar (File/Edit/View/Favorites/Tools/Window/Help) and ribbon-style action buttons with larger icons.",
+      "Connection settings tabs (General/SSL/SSH) now use 15px vertical content padding for improved spacing."
+    ]
+  },
+  {
+    "version": "0.1.3",
+    "build": 3,
+    "date": "2026-02-20",
+    "changes": [
+      "Fixed connection tree infinite Loading by wiring TreeView expanded event to node IsExpanded lazy-load flow.",
+      "Added start.bat to kill running process, build DatabaseClient.slnx, and run src/DatabaseClient.App.",
+      "Configured application/window icon to use dbClient.ico and linked dbClient.png as app resource."
+    ]
+  },
+  {
+    "version": "0.1.2",
+    "build": 2,
+    "date": "2026-02-20",
+    "changes": [
+      "Fixed startup crash caused by invalid MaterialDesign PackIconKind in MainWindow toolbar.",
+      "Hardened GlobalExceptionHandler to avoid setting ErrorDialog owner before MainWindow is loaded."
+    ]
+  },
+  {
     "version": "0.1.1",
     "build": 1,
     "date": "2026-02-19",

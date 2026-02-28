@@ -25,6 +25,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>..\..\dbClient.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="..\..\dbClient.ico" Link="Resources\dbClient.ico" />
+    <Resource Include="..\..\dbClient.png" Link="Resources\dbClient.png" />
+  </ItemGroup>
 
 </Project>

@@ -28,7 +28,8 @@
                     <TextBlock Text="Add Row" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
-            <Button Command="{Binding ApplyChangesCommand}" ToolTip="Apply Pending Changes" Padding="6,4">
+            <Button Click="ApplyChanges_Click" ToolTip="Apply Pending Changes" Padding="6,4"
+                    IsEnabled="{Binding PendingChangesCount, Converter={StaticResource IntToBoolConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="ContentSave" Width="16" Height="16" Margin="0,0,4,0" Foreground="#2196F3"/>
                     <TextBlock Text="Apply Changes" VerticalAlignment="Center"/>
@@ -75,6 +76,8 @@
                   EnableRowVirtualization="True"
                   BorderThickness="0"
                   CellEditEnding="DataGrid_CellEditEnding"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick"
+                  PreviewKeyDown="DataGrid_PreviewKeyDown"
                   LoadingRow="DataGrid_LoadingRow"
                   AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
             <DataGrid.RowValidationRules>
@@ -83,7 +86,7 @@
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Delete Row" Command="{Binding DeleteRowCommand}"
-                              CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                         <MenuItem.Icon>
                             <materialDesign:PackIcon Kind="Delete" Foreground="#E53935"/>
                         </MenuItem.Icon>
@@ -150,7 +153,7 @@
                 <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" FontSize="12"
                            Foreground="#FF9800"
                            Visibility="{Binding HasPrimaryKey, Converter={StaticResource InverseBoolToVisConverter}}">
-                    ⚠ No primary key detected — editing disabled
+                    ⚠ No primary key detected — updates use all-column matching
                 </TextBlock>
             </DockPanel>
         </Border>

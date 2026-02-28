@@ -210,3 +210,39 @@ public class IntEqualsToVisibilityConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts wizard step match to Bold/Normal font weight.
+/// </summary>
+public class StepFontWeightConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int currentStep && parameter is string stepStr && int.TryParse(stepStr, out int step))
+            return currentStep == step ? FontWeights.Bold : FontWeights.Normal;
+
+        return FontWeights.Normal;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converts an integer to bool (0 → false, non-zero → true).
+/// </summary>
+public class IntToBoolConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int intVal) return intVal != 0;
+        return false;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
